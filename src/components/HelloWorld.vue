@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949">
+      hahaha
     </el-switch>
   </div>
 </template>
