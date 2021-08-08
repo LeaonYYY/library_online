@@ -1,12 +1,16 @@
 <template>
     <div id="box_1">
+        <div id="words">
+            <p style="font-size:50px;font-weight:100;letter-spacing:5px">这是像星空</p>
+            <p style="margin-left:50px"><span style="font-size:50px;font-weight:100;letter-spacing:5px">一样</span><span style="font-size:70px;font-weight:600;margin:0 20px">浩瀚</span><span style="font-size:50px;font-weight:100;letter-spacing:5px">的图书管理系统</span></p>
+        </div>
         <div id="box_login" v-if='login_show'>
             <div id="box_login_tile">WELCOME</div>
             <div style="height:30px;display:flex"><img src="../../assets/user.png" style="height:30px;margin-left:20px"><input type="text" v-model="username" id='user_input' placeholder="请输入用户名"></div>
             <div style="height:30px;display:flex"><img src="../../assets/lock.png" style="height:30px;margin-left:20px"><input type="password" v-model="password" id='password_input' placeholder="请输入密码"></div>
             <div id="box_login_button">
                 <div style="width:45px"></div>
-                <el-button id="login_btn">登录</el-button>
+                <el-button id="login_btn" @click="handleLogin">登录</el-button>
                 <el-button id="sign_btn" @click="changeState">注册</el-button>
                 <div style="width:45px"></div>
             </div>
@@ -45,21 +49,41 @@ export default {
         this.login_show = true
         this.sign_show = false
       }
+    },
+    handleLogin () {
+      if (this.username === '') {
+        alert('用户名不能为空')
+        return 0
+      }
+      if (this.password === '') {
+        alert('密码不能为空')
+        return 0
+      }
+      this.$router.push('/user')
     }
   }
 }
 </script>
 <style scoped>
+    p {
+        margin: 0;
+    }
     input{
         border: 0;
         padding: 0;
     }
     #box_1{
         position: relative;
-        height: 580px;
+        height: 705px;
         width: 100%;
         background-image: url(../../assets/home_bp.png);
         background-size: 100% 100%;
+    }
+    #words {
+        position: absolute;
+        left: 60px;
+        top:220px;
+        color:white;
     }
     #box_login{
         height: 400px;
