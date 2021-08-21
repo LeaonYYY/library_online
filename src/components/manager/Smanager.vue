@@ -22,18 +22,15 @@
                     </span>
                 </div>
                 <div id="head_name" style="flex:2">
-                    <div style="position:absolute;top:20px;left:90px;color:white;font-size:20px;font-weight:600">{{username}}</div>
-                    <span><img src="../../assets/129.png" alt="" style="position:absolute;height:20px;top:-10px;right:50px"></span>
+                    <div style="position:absolute;top:20px;left:90px;color:#f9d19a;font-size:20px;font-weight:600">{{username}}</div>
+                    <span><img src="../../assets/149.png" alt="" style="position:absolute;height:20px;top:-10px;right:30px"></span>
                 </div>
             </div>
             <div id="nav_content">
                 <div id="nav">
                     <el-menu :default-active="this.$route.path" router>
-                        <el-menu-item index="/booksCharge">
-                        <i class="el-icon-notebook-2" style="margin:0;color:#05a3ff"></i> 图书管理
-                        </el-menu-item>
-                        <el-menu-item index="/usersCharge">
-                        <i class="el-icon-s-custom" style="margin:0;color:#05a3ff"></i>用户管理
+                        <el-menu-item index="/managerCharge">
+                        <i class="el-icon-user-solid" style="margin:0;color:#343442"></i>增删管理员
                         </el-menu-item>
                     </el-menu>
                 </div>
@@ -56,7 +53,7 @@
          <div id="selfData">
            <el-dialog :visible.sync="selfVisible" width="30%" top="6vh" :style="{'padding':0}">  
             <div id="selfBox">
-              <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">普通管理员</div>
+              <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">超级管理员</div>
               <div style="text-align:center">
                 <el-image :src='userAvator' style="height:90px;width:90px;border-radius:45px;"></el-image>
               </div>
@@ -79,8 +76,8 @@ export default {
   name: 'manager',
   data () {
     return {
-      username: 'Leaon',
-      realname:'李狗蛋',
+      username: 'LeaonY',
+      realname:'张三',
       tel:'17606051741',
       userid:'031902524',
       time:'2021/8/21',
@@ -186,7 +183,7 @@ export default {
       display: flex;
       flex-direction: column;
       background-color: #343442;
-      border-bottom: solid 2px white;
+      border-bottom: solid 2px #f9d19a;
       position: relative;
   }
   #img {
@@ -230,7 +227,7 @@ export default {
       line-height: 40px;
       margin: 10px 0;
       border-radius: 20px;
-      color: #05a3ff;
+      color: #343442;
   }
   .el-menu .el-menu-item.is-active{
       color: #343442;

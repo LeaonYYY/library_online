@@ -8,8 +8,10 @@ import advice from '@/components/advice/advicePage'
 import library from '@/components/books/library'
 import mine from '@/components/books/mine'
 import manager from '@/components/manager/manager'
+import Smanager from '@/components/manager/Smanager'
 import booksCharge from '@/components/manager/booksCharge'
 import usersCharge from '@/components/manager/usersCharge'
+import managerCharge from '@/components/manager/managerCharge'
 
 Vue.use(Router)
 
@@ -83,6 +85,22 @@ export default new Router({
           path: '/usersCharge',
           name: 'usersCharge',
           component: usersCharge
+        }
+      ]
+    },
+    {
+      name: 'Smanager',
+      path: '/Smanager',
+      component: Smanager,
+      children: [
+        {
+          path: '/',
+          component: Smanager,
+          redirect: '/managerCharge'
+        },{
+          path: '/managerCharge',
+          name: 'managerCharge',
+          component: managerCharge
         }
       ]
     }

@@ -89,7 +89,7 @@
             <p>{{pickBook.ins}}</p>
           </div>
           <div style="text-align:center">
-            <el-button type="danger" style="font-size:20px">
+            <el-button type="danger" id="btn_delete">
               下架
             </el-button>
           </div>
@@ -397,13 +397,27 @@ export default {
     text-align: center;
   }
   #add_foot .el-button {
-    width: 200px;
+    width: 150px;
     color: white;
     background-color: #42914b;
     border-radius: 20px;
     font-size: 17px;
+    font-weight: 500;
   }
   #add_foot .el-button:hover {
-    transform: scale(1.1);
+    background-color: #3b8543;
+  }
+  #btn_delete {
+    height: 40px;
+    padding: 0;
+    width: 150px;
+    color: white;
+    background-color: red;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  #btn_delete:hover{
+    background-color: #bb0707;
   }
 </style>
