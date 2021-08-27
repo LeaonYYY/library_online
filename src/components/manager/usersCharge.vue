@@ -5,24 +5,24 @@
               <img src="../../assets/131.png" alt="" style="height:50px;width:350px">
             </div>
             <div id="search">
-                <el-input placeholder="输入想搜索的用户名" v-model="serchname" @keyup.native.enter="handleSerch" suffix-icon="el-icon-search" clearable ></el-input>
+                <el-input placeholder="输入想搜索的用户名关键词" v-model="serchname" @keyup.native.enter="handleSerch" suffix-icon="el-icon-search" clearable ></el-input>
             </div>
         </div>
         <div id="box_content">
             <div id="content_body">
                 <el-row style="height:40px;line-height:40px;font-weight:600;font-size:20px">
                     <el-col :span="2">编号</el-col>
-                    <el-col :span="9">用户名</el-col>
+                    <el-col :span="7">用户名</el-col>
                     <el-col :span="4">姓名</el-col>
                     <el-col :span="7">所借书本数量</el-col>
-                    <el-col :span="2">余额</el-col>
+                    <el-col :span="4">注册时间</el-col>
                 </el-row>
                 <el-row v-for="item in itemsMode" :key="item.id" id="body_main" @click.native="pickUser(item)">
-                    <el-col :span="2">{{item.id}}</el-col>
-                    <el-col :span="9">{{item.username}}</el-col>
-                    <el-col :span="4">{{item.name}}</el-col>
-                    <el-col :span="7">{{item.lendNum}}</el-col>
-                    <el-col :span="2">{{item.money}}</el-col>
+                    <el-col :span="2">{{item.ID}}</el-col>
+                    <el-col :span="7">{{item.username}}</el-col>
+                    <el-col :span="4">{{item.realname}}&nbsp;</el-col>
+                    <el-col :span="7">{{item.booksum}}</el-col>
+                    <el-col :span="4">{{item.CreatedAt}}</el-col>
                 </el-row>
             </div>
             <div id="content_foot">
@@ -39,21 +39,19 @@
         <el-dialog :visible.sync="userVisible" width="30%">
           <div style="display:flex;height:200px">
             <div style="flex:6;display:flex;flex-direction:column;justify-content:space-around">
-              <div>姓名：{{userMode.name}}</div>
-              <div>学号：{{userMode.usernum}}</div>
-              <div>手机号：{{userMode.tel}}</div>
-              <div>邮箱：{{userMode.mail}}</div>
-              <div>专业：{{userMode.major}}</div>
+              <div>用户名：{{userMode.username}}</div>
+              <div>姓名：{{userMode.realname}}</div>
+              <div>手机号：{{userMode.phone}}</div>
+              <div>邮箱：{{userMode.email}}</div>
             </div>
             <div style="flex:4;display:flex;justify-content:center;align-items:center">
-              <el-image :src="userMode.avator" style="height:100px;width:100px;border-radius:50px;"></el-image>
+              <el-image :src="'http://8.130.51.87:3000/'+userMode.head" style="height:100px;width:100px;border-radius:50px;"></el-image>
             </div>
           </div>
           <h4>个人简介：</h4>
-          <p style="height:100px;overflow:auto">{{userMode.ins}}</p>
-          <div style="color:#1cbb27;margin-left:150px">
-            余额：{{userMode.money}}元
-          <el-button style="background-color:#38393d;color:#e4c190;margin-left:30px;border-radius:20px">充值</el-button>
+          <p style="height:100px;overflow:auto">{{userMode.introduce}}</p>
+          <div style="text-align:center">
+            <el-button type='danger' @click="handleDelete(userMode.ID)">删除</el-button>
           </div>
         </el-dialog>
     </div>
@@ -63,138 +61,6 @@ export default {
   data () {
     return {
       serchname: '',
-      items: [
-        {
-          id: 1,
-          username: 'test1',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 2,
-          username: 'test2',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 3,
-          username: 'test3',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 4,
-          username: 'test4',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 5,
-          username: 'test5',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 6,
-          username: 'test6',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 7,
-          username: 'test7',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 8,
-          username: 'test8',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 9,
-          username: 'test9',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        },
-        {
-          id: 10,
-          username: 'test10',
-          name: 'test',
-          lendNum: 18,
-          money: 128,
-          ins: '奥斯卡的吉安市开了多久阿杀了看得见爱上了科技大厦',
-          usernum: '031902000',
-          major: '计算机',
-          mail: '1530395933@qq.com',
-          tel: '17606051741',
-          avator: require('../../assets/harry.png')
-        }
-      ],
       itemsMode: [],
       itemsNum: 0,
       userVisible: false,
@@ -203,19 +69,88 @@ export default {
   },
   methods: {
     handleSerch () {
-      alert('找不到')
+      this.$axios({
+        url: '/api/v1/user/search?username='+this.serchname+'&pagesize=2&pagenum=1',
+        method: 'post'
+      }) .then((res) =>{
+        if(res.data.data.length ===0){
+          this.$message({
+            message: '找不到相关用户',
+            type: 'error'
+          }),
+          this.$router.go(0)
+        }else{
+          this.itemsMode = []
+           for(let i=0;i<res.data.data.length;i++){
+            this.$set(this.itemsMode,i,res.data.data[i])
+            this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+          }
+        }
+      })
     },
     handleCurrentChange (val) {
-      this.itemsMode = this.items.slice((val - 1) * 8, val * 8)
+      this.itemsMode = []
+      this.$axios({
+      url: '/api/v1/users?pagesize=8&pagenum='+val,
+      method: 'get',
+      headers: {
+        'Authorization': "Bearer "+localStorage.getItem('token1')
+      }
+    }).then((res)=>{
+      console.log(res);
+      for(let i=0;i<res.data.data.length;i++){
+        this.$set(this.itemsMode,i,res.data.data[i])
+        this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+      }
+      this.itemsNum = res.data.num
+    })
     },
     pickUser (item) {
       this.userMode = item
       this.userVisible = true
+    },
+    handleDelete(id){
+       this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$axios({
+            url: '/api/v1/user/'+id,
+            method: 'delete',
+            headers:{
+              'Authorization': "Bearer "+localStorage.getItem('token1')
+            }
+          }).then((res)=>{
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.$router.go(0)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
     }
   },
   mounted () {
-    this.itemsMode = this.items.slice(0, 8)
-    this.itemsNum = this.items.length
+    this.$axios({
+      url: '/api/v1/users?pagesize=8&pagenum=1',
+      method: 'get',
+      headers: {
+        'Authorization': "Bearer "+localStorage.getItem('token1')
+      }
+    }).then((res)=>{
+      console.log(res);
+      for(let i=0;i<res.data.data.length;i++){
+        this.$set(this.itemsMode,i,res.data.data[i])
+        this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+      }
+      this.itemsNum = res.data.num
+    })
   }
 }
 </script>

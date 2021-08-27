@@ -11,6 +11,7 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.$axios = axios
 axios.defaults.withCredentials = true
+axios.defaults.baseURL = '/api'
 
 /* eslint-disable no-new */
 new Vue({

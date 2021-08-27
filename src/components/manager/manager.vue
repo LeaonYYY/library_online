@@ -3,7 +3,7 @@
         <div id="box_nav">
             <div id="nav_head">
                 <div id="head_img" style="flex:8">
-                    <img src="../../assets/harry.png" alt="" id="img">
+                    <img :src="'http://8.130.51.87:3000/'+user.head" alt="" id="img">
                     <span id="btn_quit">
                         <el-dropdown @command="handleCommand">
                           <span class="el-dropdown-link">
@@ -45,10 +45,10 @@
         <el-dialog :visible.sync="msgVisible" title="消息通知" top="3vh" width="30%">
             <div id="msg_box">
               <div v-for="msg in msgs" :key="msg.id" style="height:100px;margin-bottom:20px">
-                <div style="text-align:center">{{msg.date}}</div>
+                <div style="text-align:center">{{msg.Creattime}}</div>
                 <div style="background-color: rgb(236, 232, 233);height:70px;display:flex;flex-direction:column;justify-content:space-around;border-radius:20px;">
-                  <h3 style="margin:0;margin-left:20px">{{msg.head}}</h3>
-                  <div style="margin-left:20px">{{msg.content}}</div>
+                  <h3 style="margin:0;margin-left:20px">通知</h3>
+                  <div style="margin-left:20px">{{msg.MsgUser}}:&nbsp;&nbsp;{{msg.MsgContext}}</div>
                 </div>
               </div>
             </div>
@@ -58,18 +58,42 @@
             <div id="selfBox">
               <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">普通管理员</div>
               <div style="text-align:center">
-                <el-image :src='userAvator' style="height:90px;width:90px;border-radius:45px;"></el-image>
+                <el-image :src="'http://8.130.51.87:3000/'+user.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
               </div>
-              <div class="selfLines">昵称：{{username}}</div>
-              <div class="selfLines">姓名：{{realname}}</div>
-              <div class="selfLines">手机号：{{tel}}</div>
-              <div class="selfLines">学号：{{userid}}</div>
-              <div class="selfLines">上任时间：{{time}}</div>
-              <div style="height:100px;margin-left: 70px;">个人简介：
+              <div class="selfLines">昵称：{{user.username}}</div>
+              <div class="selfLines">姓名：{{user.realname}}</div>
+              <div class="selfLines">手机号：{{user.phone}}</div>
+              <div class="selfLines">邮箱：{{user.email}}</div>
+              <div style="height:80px;margin-left: 70px;">个人简介：
                 <p style="margin: 0">
-                  {{ins}}
+                  {{user.introduce}}
                 </p></div>
+               <div style="text-align:center">
+                 <el-button type="primary" @click="changeSelfVisible=true">修改</el-button>
+               </div>
             </div>
+           </el-dialog>
+         </div>
+         <div>
+           <el-dialog :visible.sync="changeSelfVisible" title="信息修改" width="30%">
+             <div style="display:flex;flex-direction:column;justify-content:space-around;height:350px">
+               <div style="text-align:center;">
+                 <el-upload
+                    class="avatar-uploader"
+                    action="#"
+                    :show-file-list="false"
+                    :on-change="handleAvatarChange">
+                    <img v-if="imageUrl" :src="imageUrl" style="height:50px;width:50px;border-radius:25px;display:block;">
+                    <i v-else class="el-icon-plus" style="height:50px;width:50px;border-radius:25px;text-align:center;line-height:50px"></i>
+                  </el-upload>
+               </div>
+               <div>用户名：{{user.username}}</div>
+               <div><el-input placeholder="真实姓名" v-model="realname_c"></el-input></div>
+               <div><el-input placeholder="手机号" v-model="tel_c"></el-input></div>
+               <div><el-input placeholder="邮箱" v-model="email_c"></el-input></div>
+               <div><el-input placeholder="个人简介" type="textarea" :rows="3" v-model="ins_c"></el-input></div>
+               <div style="text-align:center"><el-button type="primary" @click="handleChange">修改</el-button></div>
+             </div>
            </el-dialog>
          </div>
     </div>
@@ -79,82 +103,74 @@ export default {
   name: 'manager',
   data () {
     return {
-      username: 'Leaon',
-      realname:'李狗蛋',
-      tel:'17606051741',
-      userid:'031902524',
-      time:'2021/8/21',
-      ins:'这个管理员很神秘，没有任何简介',
+      realname_c:'',
+      tel_c: '',
+      email_c: '',
+      ins_c: '',
+      username: '',
+      user: {},
       isNewMsg: true,
       msgVisible: false,
-      msgs: [{
-        id: 1,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 2,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 3,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 4,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 5,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 6,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 7,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 8,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 9,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      },
-      {
-        id: 10,
-        date: '2021.8.9/9:20',
-        head: '充值成功通知',
-        content: '尊敬的用户，您已成功充值了50元快去借书吧'
-      }
-      ],
+      msgs: [],
       selfVisible: false,
-      userAvator: require('../../assets/harry.png')
+      changeSelfVisible: false,
+      imageUrl: '',
+      avator_add: {}
     }
   },
   methods: {
+    handleChange(){
+      if(this.realname_c ==='' || this.email_c ==='' || this.tel_c ==='' ||this.ins_c === ''){
+              this.$message({
+                  message: '输入框不能为空',
+                  type: 'error'
+              })
+              return
+          }
+          var reg1 = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+          if(!reg1.test(this.email_c)){
+              this.$message({
+                  message: '邮箱格式错误',
+                  type: 'error'
+              })
+              return
+          }
+          var reg2 = /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+          if(!reg2.test(this.tel_c)){
+              this.$message({
+                  message: '手机号格式错误',
+                  type: 'error'
+              })
+              return
+          }
+          var params = new FormData()
+          params.append('username',this.user.username)
+          params.append('imag',this.avator_add.raw,this.avator_add.name)
+          params.append('phone',this.tel_c)
+          params.append('email',this.email_c)
+          params.append('introduce',this.ins_c)
+          params.append('realname',this.realname_c)
+          this.$axios({
+              url: '/api/v1/user/'+this.user.ID,
+              method: 'put',
+              data: params,
+              headers: {
+                  'Authorization': "Bearer "+localStorage.getItem('token1')  
+              }
+          }).then((res)=>{
+             this.$message({
+               message: '修改成功',
+               type: 'success'
+             })
+             this.$router.go(0)
+          })
+    },
     handleQuit () {
       this.$router.push('/')
+    },
+    handleAvatarChange (file, fileList) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+      this.avator_add = file
     },
     handleCommand(command){
       if(command ==='quit'){
@@ -164,6 +180,30 @@ export default {
         this.selfVisible = true
       }
     }
+  },
+  mounted(){
+    this.$axios({
+      url: '/api/v1/user',
+      method: 'get',
+      headers:{
+        'Authorization': "Bearer "+localStorage.getItem('token1')
+      }
+    }) .then((res) =>{
+      this.username = res.data.data.username
+      this.user = res.data.data
+    })
+    this.$axios({
+      url: '/api/v1/admin/msg',
+      method: 'get',
+      headers: {
+           'Authorization': "Bearer "+localStorage.getItem('token1')  
+        }
+    }) .then(res =>{
+      for(let i=0;i<res.data.message.length;i++){
+        this.$set(this.msgs,i,res.data.message[i])
+        this.msgs[i].Creattime = this.msgs[i].Creattime.slice(0,10)
+      }
+    })
   }
 }
 </script>
@@ -247,7 +287,6 @@ export default {
    height: 500px;
    width: 100%;
    overflow: auto;
-   margin-left: 5%;
  }
  #selfBox{
    height:480px;

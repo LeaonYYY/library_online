@@ -1,45 +1,141 @@
 <template>
     <div id="app">
         <div id="box_head">
-            <el-image :src="userImg" class="userimg"></el-image>
+            <el-image :src="'http://8.130.51.87:3000/'+imag" class="userimg"></el-image>
             <span class="username">{{username}}</span>
         </div>
         <div id="box_content">
             <div id="datas">
-                <div>姓名：{{username_R}}</div>
-                <div>学号：{{usernum}}</div>
+                <div>用户名：{{username}}</div>
+                <div>姓名：{{realname}}</div>
                 <div>手机号：{{usertel}}</div>
-                <div>邮箱：{{usermail}}</div>
-                <div>专业：{{usermajor}}</div>
+                <div>邮箱：{{email}}</div>
             </div>
             <div id="introduce">
                 <h3>个人简介</h3>
                 <p v-if="!isChange">{{userins}}</p>
                 <el-input clearable maxlength="150" show-word-limit type="textarea" v-if="isChange" v-model="userins" :rows="8"></el-input>
                 <div>
-                    <el-button type="primary" class="btn_changeIns" @click="isChange = true" v-if="!isChange">修改简介</el-button>
+                    <el-button type="primary" class="btn_changeIns" @click="changeVisible =true" v-if="!isChange">修改</el-button>
                     <el-button type="primary" class="btn_changeIns" @click="isChange = false" v-if="isChange">保存</el-button>
                 </div>
-                <div ><span style="color:#1cbb27">余额：{{money}}元</span><el-button id="btn_money" >充值</el-button></div>
             </div>
         </div>
+        <el-dialog :visible.sync="changeVisible" title="修改资料" width="30%" >
+            <div style="display:flex;flex-direction:column;justify-content:space-around;height:350px">
+               <div style="text-align:center;">
+                 <el-upload
+                    class="avatar-uploader"
+                    action="#"
+                    :show-file-list="false"
+                    :on-change="handleAvatarChange">
+                    <img v-if="imageUrl" :src="imageUrl" style="height:50px;width:50px;border-radius:25px;display:block;">
+                    <i v-else class="el-icon-plus" style="height:50px;width:50px;border-radius:25px;text-align:center;line-height:50px"></i>
+                  </el-upload>
+               </div>
+               <div>用户名：{{username}}</div>
+               <div><el-input placeholder="真实姓名" v-model="realname_c"></el-input></div>
+               <div><el-input placeholder="手机号" v-model="tel_c"></el-input></div>
+               <div><el-input placeholder="邮箱" v-model="email_c"></el-input></div>
+               <div><el-input placeholder="个人简介" type="textarea" :rows="3" v-model="ins_c"></el-input></div>
+               <div style="text-align:center"><el-button type="primary" @click="handleChange">修改</el-button></div>
+             </div>
+        </el-dialog>
     </div>
 </template>
 <script>
 export default {
   data () {
     return {
-      username: 'leaon',
-      username_R: '杨少杰',
-      usernum: '031902524',
-      usertel: '17606051741',
-      usermail: '1530395933@qq.com',
-      usermajor: '计算机',
-      userins: '这个人很懒，什么都没写',
+      id: 0,
+      username: '',
+      realname: '',
+      usernum: '',
+      usertel: '',
+      email: '',
+      imag:'',
+      userins: '',
       userImg: require('../../assets/4.png'),
       money: 648,
-      isChange: false
+      isChange: false,
+      changeVisible: false,
+      realname_c:'',
+      tel_c: '',
+      email_c: '',
+      ins_c: '',
+      imageUrl: '',
+      avator_add: {}
     }
+  },
+  methods:{
+      handleChange(){
+          if(this.ins_c === '' || this.realname_c ==='' || this.email_c ==='' || this.tel_c ===''){
+              this.$message({
+                  message: '输入框不能为空',
+                  type: 'error'
+              })
+              return
+          }
+          var reg1 = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+          if(!reg1.test(this.email_c)){
+              this.$message({
+                  message: '邮箱格式错误',
+                  type: 'error'
+              })
+              return
+          }
+          var reg2 = /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+          if(!reg2.test(this.tel_c)){
+              this.$message({
+                  message: '手机号格式错误',
+                  type: 'error'
+              })
+              return
+          }
+          var params = new FormData()
+          params.append('username',this.username)
+          params.append('imag',this.avator_add.raw,this.avator_add.name)
+          params.append('phone',this.tel_c)
+          params.append('email',this.email_c)
+          params.append('introduce',this.ins_c)
+          params.append('realname',this.realname_c)
+          this.$axios({
+              url: '/api/v1/user/'+this.id,
+              method: 'put',
+              data: params,
+              headers: {
+                  'Authorization': "Bearer "+localStorage.getItem('token1')  
+              }
+          }).then((res)=>{
+             this.$message({
+               message: '修改成功',
+               type: 'success'
+             })
+             this.$router.go(0)
+          })
+      },
+      handleAvatarChange (file, fileList) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+      this.avator_add = file
+    }
+  },
+  mounted(){
+      this.$axios({
+          url: '/api/v1/user',
+          method: 'get',
+          headers: {
+             'Authorization': "Bearer "+localStorage.getItem('token1')  
+          }
+      }) .then((res)=>{
+          console.log(res);
+          this.username =res.data.data.username
+          this.usertel = res.data.data.phone
+          this.realname = res.data.data.realname
+          this.userins = res.data.data.introduce
+          this.email = res.data.data.email
+          this.imag = res.data.data.head
+          this.id = res.data.data.ID
+      })
   }
 }
 </script>
