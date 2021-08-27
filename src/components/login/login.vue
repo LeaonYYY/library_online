@@ -19,13 +19,12 @@
             <div style="font-size: 25px;
         text-align: center;
         color: white;height:40px;line-height:40px">注册</div>
-            <div class="sign_input"><input type="text" placeholder="真实姓名"></div>
-            <div class="sign_input"><input type="text" placeholder="用户名"></div>
-            <div class="sign_input"><input type="text" placeholder="学号"></div>
-            <div class="sign_input"><input type="text" placeholder="手机号"></div>
-            <div class="sign_input"><input type="password" placeholder="密码(6-16个字符，区分大小写)"></div>
-            <div class="sign_input"><input type="password" placeholder="确认密码"></div>
-            <div class="sign_btn"><el-button id='sign'>注册</el-button>
+            <div class="sign_input"><input type="text" placeholder="用户名" v-model="r_username"></div>
+            <div class="sign_input"><input type="text" placeholder="邮箱" v-model="r_email"></div>
+            <div class="sign_input"><input type="text" placeholder="手机号" v-model="r_tel"></div>
+            <div class="sign_input"><input type="password" placeholder="密码(6-16个字符，区分大小写)" v-model="r_psw"></div>
+            <div class="sign_input"><input type="password" placeholder="确认密码" v-model="r_checkPsw"></div>
+            <div class="sign_btn"><el-button id='sign' @click="handleSign">注册</el-button>
             <a  @click="changeState">已有账号，快速登录</a></div></div>
     </div>
 </template>
@@ -37,11 +36,16 @@ export default {
       username: '',
       password: '',
       login_show: true,
-      sign_show: false
+      sign_show: false,
+      r_username:'',
+      r_email: '',
+      r_tel: '',
+      r_psw: '',
+      r_checkPsw: ''
     }
   },
   methods: {
-    changeState: function () {
+    changeState () {
       if (this.login_show === true) {
         this.login_show = false
         this.sign_show = true
@@ -59,7 +63,88 @@ export default {
         alert('密码不能为空')
         return 0
       }
-      this.$router.push('/user')
+      var params = new FormData()
+      params.append('username',this.username)
+      params.append('password',this.password)
+      this.$axios({
+          url: '/api/v1/login',
+          method: 'post',
+          data: params
+      }) .then((res) => {
+          if(res.data.token){
+            localStorage.setItem('token1',res.data.token)
+            switch(res.data.role){
+                case 0:
+                    this.$router.push('/Smanager')
+                    break
+                case 1:
+                    this.$router.push('/manager')
+                    break
+                case 2:
+                    this.$router.push('/user')
+                default:
+                    break    
+            }
+          }else{
+              this.$message({
+                  message: '用户名或密码错误',
+                  type: 'error'
+              })
+          }
+      })
+    },
+    handleSign (){
+      if(this.r_username === '' || this.r_email ==='' || this.r_tel ==='' || this.r_psw ==='' || this.r_checkPsw === ''){
+          this.$message({
+              message: '输入框不能为空',
+              type: 'error'
+          })
+          return
+      }
+      var reg1 = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+      if(!reg1.test(this.r_email)){
+          this.$message({
+              message: '邮箱格式错误',
+              type: 'error'
+          })
+          return
+      }
+      var reg2 = /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+      if(!reg2.test(this.r_tel)){
+          this.$message({
+              message: '手机号格式错误',
+              type: 'error'
+          })
+          return
+      }
+      if(this.r_psw != this.r_checkPsw){
+          this.$message({
+              message: '两次输入的密码不一致',
+              type: 'error'
+          })
+          return
+      }
+      var params = new FormData()
+      params.append('username',this.r_username)
+      params.append('email',this.r_email)
+      params.append('phone',this.r_tel)
+      params.append('password',this.r_psw)
+      params.append('role',1)
+      this.$axios({
+          url: '/api/v1/user/add',
+          method: 'post',
+          data: params
+      }) .then((res)=> {
+          if(res.data.status === '创建成功') {
+             this.$message({
+                 message: '注册成功',
+                 type: 'success'
+             })
+             this.$router.go(0)
+          }else {
+              console.log(res);
+          }
+      })
     }
   }
 }

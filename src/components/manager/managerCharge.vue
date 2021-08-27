@@ -15,10 +15,10 @@
                     <el-col :span="9">上任时间</el-col>
                 </el-row>
                 <el-row v-for="item in itemsMode" :key="item.id" id="body_main" @click.native="managerShow(item)">
-                    <el-col :span="2">{{item.id}}</el-col>
+                    <el-col :span="2">{{item.ID}}</el-col>
                     <el-col :span="9">{{item.username}}</el-col>
-                    <el-col :span="4">{{item.realname}}</el-col>
-                    <el-col :span="9">{{item.time}}</el-col>
+                    <el-col :span="4">{{item.realname}}&nbsp;</el-col>
+                    <el-col :span="9">{{item.CreatedAt}}</el-col>
                 </el-row>
             </div>
             <div id="content_foot">
@@ -56,17 +56,17 @@
             </div>
             <div style="flex:8;display:flex;flex-direction:column;justify-content:space-around;margin-left:20px;">
               <div style="text-align: center"><img src="../../assets/129.png" alt=""></div>
-              <div><el-input placeholder="姓名" v-model="addManager_realname"></el-input></div>
-              <div><el-input placeholder="学号" v-model="addManager_id"></el-input></div>
+              <div><el-input placeholder="用户名" v-model="addManager_username"></el-input></div>
+              <div><el-input placeholder="密码" v-model="addManager_psw"></el-input></div>
             </div>
           </div>
-          <div class="adding"><el-input placeholder="昵称" v-model="addManager_username"></el-input></div>
+          <div class="adding"><el-input placeholder="邮箱" v-model="addManager_email"></el-input></div>
           <div class="adding"><el-input placeholder="手机号" v-model="addManager_tel"></el-input></div>
           <div id="add_body" style="margin:20px 0;">
             <el-input type="textarea" :maxlength="250" show-word-limit v-model="addManager_ins" :rows="6" placeholder="内容简介"></el-input>
           </div>
           <div id="add_foot">
-            <el-button>添加</el-button>
+            <el-button @click="handleAddAdmin">添加</el-button>
           </div>
         </el-dialog>
         <div id="selfData">
@@ -74,18 +74,18 @@
             <div id="selfBox">
               <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">普通管理员</div>
               <div style="text-align:center">
-                <el-image :src='pickManager.userAvator' style="height:90px;width:90px;border-radius:45px;"></el-image>
+                <el-image :src="'http://8.130.51.87:3000/'+pickManager.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
               </div>
               <div class="selfLines">昵称：{{pickManager.username}}</div>
               <div class="selfLines">姓名：{{pickManager.realname}}</div>
-              <div class="selfLines">手机号：{{pickManager.tel}}</div>
-              <div class="selfLines">学号：{{pickManager.userid}}</div>
-              <div class="selfLines">上任时间：{{pickManager.time}}</div>
+              <div class="selfLines">手机号：{{pickManager.phone}}</div>
+              <div class="selfLines">邮箱：{{pickManager.email}}</div>
+              <div class="selfLines">上任时间：{{pickManager.CreatedAt}}</div>
               <div style="height:70px;margin-left: 70px;">个人简介：
                 <p style="margin: 0">
                   {{pickManager.ins}}
                 </p></div>
-               <div style="text-align:center" ><el-button id="btn_change">调整权限</el-button></div>
+               <div style="text-align:center" ><el-button id="btn_change" @click="handleDelete(pickManager.ID)">删除</el-button></div>
             </div>
            </el-dialog>
          </div>
@@ -196,19 +196,46 @@ export default {
       imageUrl: '',
       pickManager: {},
       managerVisible: false,
-      addManager_realname: '',
-      addManager_id: '',
       addManager_username: '',
+      addManager_email: '',
+      addManager_psw: '',
       addManager_tel: '',
       addManager_ins: ''
     }
   },
   methods: {
     handleSerch () {
-      alert('找不到')
+      this.$axios({
+        url: '/api/v1/admin/search?username='+this.serchname+'&pagesize=2&pagenum=1',
+        method: 'post'
+      }) .then((res) =>{
+        if(res.data.data.length ===0){
+          this.$message({
+            message: '找不到相关用户',
+            type: 'error'
+          })
+          this.$router.go(0)
+        }else{
+          this.itemsMode = []
+           for(let i=0;i<res.data.data.length;i++){
+            this.$set(this.itemsMode,i,res.data.data[i])
+            this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+          }
+        }
+      })
     },
     handleCurrentChange (val) {
-      this.itemsMode = this.items.slice((val - 1) * 8, val * 8)
+      this.itemsMode = []
+      this.$axios({
+          url: '/api/v1/admins?pagesize=8&pagenum='+val,
+          method: 'get'
+        }) .then((res)=>{
+          for(let i=0;i<res.data.data.length;i++){
+            this.$set(this.itemsMode,i,res.data.data[i])
+            this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+          }
+          this.itemsNum = res.data.num
+        })
     },
     handleAvatarChange (file, fileList) {
       this.imageUrl = URL.createObjectURL(file.raw)
@@ -229,11 +256,88 @@ export default {
     managerShow (item) {
       this.pickManager = item
       this.managerVisible = true
+    },
+    handleDelete(id){
+      this.$axios({
+        url: '/api/v1/admin/delete/'+id,
+        method: 'put',
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1')
+        }
+      }) .then((res)=>{
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        })
+        this.$router.go(0)
+      })
+    },
+    handleAddAdmin() {
+      if(this.addManager_username === '' || this.addManager_email ==='' || this.addManager_tel ==='' || this.addManager_psw ===''){
+          this.$message({
+              message: '输入框不能为空',
+              type: 'error'
+          })
+          return
+      }
+      var reg1 = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+      if(!reg1.test(this.addManager_email)){
+          this.$message({
+              message: '邮箱格式错误',
+              type: 'error'
+          })
+          return
+      }
+      var reg2 = /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/
+      if(!reg2.test(this.addManager_tel)){
+          this.$message({
+              message: '手机号格式错误',
+              type: 'error'
+          })
+          return
+      }
+      var params = new FormData()
+      params.append('username',this.addManager_username)
+      params.append('password',this.addManager_psw)
+      params.append('email',this.addManager_email)
+      params.append('phone',this.addManager_tel)
+      params.append('imag','')
+      this.$axios({
+        url: '/api/v1/admin/creat',
+        method: 'put',
+        data: params,
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1')
+        }
+      }) .then((res) =>{
+        console.log(res);
+        if(res.data.status === '管理员创建成功') {
+          this.$message({
+            message: '管理员添加成功',
+            type: 'success'
+          })
+          this.$router.go(0)
+        }else {
+          this.$message({
+            message: '用户已存在',
+            type: 'error'
+          })
+        }
+      })
     }
   },
   mounted () {
-    this.itemsMode = this.items.slice(0, 8)
-    this.itemsNum = this.items.length
+    this.$axios({
+      url: '/api/v1/admins?pagesize=8&pagenum=1',
+      method: 'get'
+    }) .then((res)=>{
+      console.log(res);
+      for(let i=0;i<res.data.data.length;i++){
+        this.$set(this.itemsMode,i,res.data.data[i])
+        this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+      }
+      this.itemsNum = res.data.num
+    })
   }
 }
 </script>

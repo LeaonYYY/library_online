@@ -12,17 +12,22 @@
             <div id="content_body">
                 <el-row style="height:40px;line-height:40px;font-weight:600;font-size:20px">
                     <el-col :span="2">编号</el-col>
-                    <el-col :span="9">书名</el-col>
+                    <el-col :span="7">书名</el-col>
                     <el-col :span="4">种类</el-col>
-                    <el-col :span="7">出借数量</el-col>
-                    <el-col :span="2">剩余数量</el-col>
+                    <el-col :span="5">出借数量</el-col>
+                    <el-col :span="4">剩余数量</el-col>
+                    <el-col :span="2">状态</el-col>
                 </el-row>
                 <el-row v-for="item in itemsMode" :key="item.id" id="body_main" @click.native="bookShow(item)">
-                    <el-col :span="2">{{item.id}}</el-col>
-                    <el-col :span="9">{{item.name}}</el-col>
-                    <el-col :span="4">{{item.type}}</el-col>
-                    <el-col :span="7">{{item.lendNum}}</el-col>
-                    <el-col :span="2">{{item.leftNum}}</el-col>
+                    <el-col :span="2">{{item.ID}}</el-col>
+                    <el-col :span="7">{{item.bookname}}</el-col>
+                    <el-col :span="4">{{item.booktype}}</el-col>
+                    <el-col :span="5">{{item.borrowsum}}</el-col>
+                    <el-col :span="4">{{item.sum}}</el-col>
+                    <el-col :span="2">
+                      <div style="color:#32CD32" v-if="(item.state === 'yes')">已上架</div>
+                      <div style="color:red" v-if="(item.state === 'no')">未上架</div>
+                    </el-col>
                 </el-row>
             </div>
             <div id="content_foot">
@@ -71,25 +76,26 @@
             <el-input type="textarea" :maxlength="250" show-word-limit v-model="addBook_ins" :rows="6" placeholder="内容简介"></el-input>
           </div>
           <div id="add_foot">
-            <el-button>添加</el-button>
+            <el-button @click="handleBookAdd">添加</el-button>
           </div>
         </el-dialog>
         <el-dialog :visible.sync="bookVisible" width="30%">
           <div style="display:flex;height:150px">
-            <div style="flex:4"><el-image :src="pickBook.img" alt="" style="height:150px"></el-image></div>
+            <div style="flex:4"><el-image :src="'http://8.130.51.87:3000/'+pickBook.imag" alt="" style="height:150px;width:140px"></el-image></div>
             <div style="flex:6;display:flex;justify-content:space-around;flex-direction:column;margin-left:70px">
-              <h4>{{pickBook.name}}</h4>
-              <div>出借：{{pickBook.lendNum}}本</div>
-              <div>剩余：{{pickBook.leftNum}}本</div>
+              <h4>{{pickBook.bookname}}</h4>
+              <div>出借：{{pickBook.borrowsum}}本</div>
+              <div>剩余：{{pickBook.sum}}本</div>
               <div>作者：{{pickBook.author}}</div>
-              <div>上架时间：{{pickBook.update}}</div>
+              <div>上架时间：{{pickBook.CreatedAt}}</div>
             </div>
           </div>
           <div style="margin:25px 0;height:100px;overflow: auto;">
-            <p>{{pickBook.ins}}</p>
+            <p>{{pickBook.Introduce}}</p>
           </div>
           <div style="text-align:center">
-            <el-button type="danger" id="btn_delete">
+            <el-button type="success" id="btn_up" @click="handleUp(pickBook.ID)">上架</el-button>
+            <el-button type="danger" id="btn_delete" @click="handleDelete(pickBook.ID)">
               下架
             </el-button>
           </div>
@@ -236,18 +242,123 @@ export default {
       addBook_type: '',
       addBook_num: '',
       addBook_ins: '',
-      pickBook: {}
+      pickBook: {},
+      avator_add: {}
     }
   },
   methods: {
     handleSerch () {
-      alert('找不到')
+      this.$axios({
+        url: '/api/v1/book/search?bookname='+this.serchname+'&pagesize=2&pagenum=1',
+        method: 'post'
+      }) .then((res) =>{
+        if(res.data.data.length ===0){
+          this.$message({
+            message: '找不到相关书籍',
+            type: 'error'
+          }),
+          this.$router.go(0)
+        }else{
+          this.itemsMode = []
+           for(let i=0;i<res.data.data.length;i++){
+            this.$set(this.itemsMode,i,res.data.data[i])
+            this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+          }
+        }
+      })
     },
     handleCurrentChange (val) {
-      this.itemsMode = this.items.slice((val - 1) * 8, val * 8)
+      this.itemsMode=[]
+      this.$axios({
+      url: '/api/v1/books?pagesize=8&pagenum='+val,
+      method: 'get',
+      headers: {
+        'Authorization': "Bearer "+localStorage.getItem('token1')
+      }
+    }).then((res)=>{
+      console.log(res);
+      for(let i=0;i<res.data.data.length;i++){
+        this.$set(this.itemsMode,i,res.data.data[i])
+        this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+      }
+      this.itemsNum = res.data.num
+    })
+    },
+    handleUp(id){
+      this.$axios({
+        url: '/api/v1/book/'+id+'/up',
+        method: 'put',
+        headers:{
+          'Authorization': "Bearer "+localStorage.getItem('token1')
+        }
+      }) .then(res => {
+        this.$message({
+          message: '上架成功',
+          type: 'success'
+        })
+        this.$router.go(0)
+      })
+    },
+    handleDelete(id){
+      this.$confirm('此操作将下架该书籍, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$axios({
+            url: '/api/v1/book/'+id+'/down',
+            method: 'put',
+            headers:{
+              'Authorization': "Bearer "+localStorage.getItem('token1')
+            }
+          }).then((res)=>{
+            this.$message({
+              message: '下架成功',
+              type: 'success'
+            })
+            this.$router.go(0)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    },
+    handleBookAdd(){
+      var params =new FormData()
+      params.append('bookname',this.addBook_name)
+      params.append('author',this.addBook_author)
+      params.append('booktype',this.addBook_type)
+      params.append('sum',this.addBook_num)
+      params.append('introduce',this.addBook_ins)
+      params.append('imag',this.avator_add.raw,this.avator_add.name)
+      this.$axios({
+        url: '/api/v1/book/add',
+        method: 'post',
+        data: params,
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1'),
+          'Content-Type':'multipart/form-data'
+        }
+      }).then((res)=>{
+        if(res.data.status ==='创建成功'){
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this.$router.go(0)
+        }else{
+          this.$message({
+            message: '出现错误',
+            type: 'error'
+          })
+        }
+      })
     },
     handleAvatarChange (file, fileList) {
       this.imageUrl = URL.createObjectURL(file.raw)
+      this.avator_add = file
     },
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
@@ -268,8 +379,19 @@ export default {
     }
   },
   mounted () {
-    this.itemsMode = this.items.slice(0, 8)
-    this.itemsNum = this.items.length
+    this.$axios({
+      url: '/api/v1/books?pagesize=8&pagenum=1',
+      method: 'get',
+      headers: {
+        'Authorization': "Bearer "+localStorage.getItem('token1')
+      }
+    }).then((res)=>{
+      for(let i=0;i<res.data.data.length;i++){
+        this.$set(this.itemsMode,i,res.data.data[i])
+        this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
+      }
+      this.itemsNum = res.data.num
+    })
   }
 }
 </script>
@@ -410,9 +532,17 @@ export default {
   #btn_delete {
     height: 40px;
     padding: 0;
-    width: 150px;
+    width: 100px;
     color: white;
     background-color: red;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  #btn_up {
+    height: 40px;
+    padding: 0;
+    width: 100px;
     border-radius: 20px;
     font-size: 17px;
     font-weight: 500;
