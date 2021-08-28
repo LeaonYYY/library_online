@@ -64,7 +64,15 @@ export default new Router({
           path: '/advice',
           component: advice
         }
-      ]
+      ],
+      beforeEnter(to,from,next){
+        if(localStorage.loginStatus1==='true'){       
+          next();
+        }else{
+          alert("请先登录");
+          next('/');
+        }
+      }
     },
     {
       name: 'manager',
@@ -86,7 +94,15 @@ export default new Router({
           name: 'usersCharge',
           component: usersCharge
         }
-      ]
+      ],
+      beforeEnter(to,from,next){
+        if(localStorage.loginStatus1==='true'){       
+          next();
+        }else{
+          alert("请先登录");
+          next('/');
+        }
+      }
     },
     {
       name: 'Smanager',
@@ -102,7 +118,16 @@ export default new Router({
           name: 'managerCharge',
           component: managerCharge
         }
-      ]
+      ],
+      beforeEnter(to,from,next){
+        if(localStorage.loginStatus1==='true'){       
+          next();
+        }else{
+          alert("请先登录");
+          next('/');
+        }
+      }
     }
   ]
 })
+

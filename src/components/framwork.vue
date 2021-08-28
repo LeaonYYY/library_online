@@ -42,6 +42,7 @@ export default {
   },
   methods: {
     handleQuit(){
+      localStorage.setItem('loginStatus1','false')
       this.$router.push('/')
     }
   },

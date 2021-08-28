@@ -72,6 +72,7 @@ export default {
           data: params
       }) .then((res) => {
           if(res.data.token){
+            localStorage.setItem('loginStatus1','true')
             localStorage.setItem('token1',res.data.token)
             switch(res.data.role){
                 case 0:

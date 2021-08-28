@@ -166,6 +166,7 @@ export default {
           })
     },
     handleQuit () {
+      localStorage.setItem('loginStatus1','false')
       this.$router.push('/')
     },
     handleAvatarChange (file, fileList) {

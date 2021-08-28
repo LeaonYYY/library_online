@@ -167,6 +167,7 @@ export default {
       this.avator_add = file
     },
     handleQuit () {
+      localStorage.setItem('loginStatus1','false')
       this.$router.push('/')
     },
     handleCommand(command){
