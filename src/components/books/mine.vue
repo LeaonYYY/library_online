@@ -51,7 +51,7 @@
                 <h4>精彩评论:</h4>
                 <div id="comments">
                     <div class="comment" v-for="comment in comments" :key="comment.id">
-                        <div><img src="../../assets/4.png" alt="" style="height:30px"></div>
+                        <div><img :src="'http://8.130.51.87:3000/'+comment.Head" alt="" style="height:30px"></div>
                         <div style="display:flex;flex-direction:column">
                             <div style="height:30px;line-height:30px">{{comment.Commentuser}}&nbsp;&nbsp;&nbsp;&nbsp;{{comment.UpdatedAt}}</div>
                             <div>{{comment.Context}}</div>
