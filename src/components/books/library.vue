@@ -30,7 +30,7 @@
         </div>
         <el-dialog :visible.sync="bookVisible" id="bookDetail" style="padding-top:0px" top="2vh">
             <div id="bookDetail_head" style="margin-left:60px">
-                <div style="height:200px;width:200px"><el-image :src="'http://8.130.51.87:3000/'+pickBook.imag"></el-image></div>
+                <div style="height:200px;width:200px"><el-image :src="pickBook.imag" style="height:200px"></el-image></div>
                 <div style="display:flex;flex-direction:column;justify-content:space-around;margin-left:60px">
                     <div><h3 style="margin:0">{{pickBook.bookname}}</h3></div>
                     <div style="height:90px;width:300px;display:flex;flex-direction:row;justify-content:space-between">
@@ -51,7 +51,7 @@
                 <h4>精彩评论:</h4>
                 <div id="comments">
                     <div class="comment" v-for="comment in comments" :key="comment.id">
-                        <div><img :src="'http://8.130.51.87:3000/'+comment.Head" alt="" style="height:30px">&nbsp;&nbsp;&nbsp;</div>
+                        <div><img :src="comment.Head" alt="" style="height:30px">&nbsp;&nbsp;&nbsp;</div>
                         <div style="display:flex;flex-direction:column">
                             <div style="height:30px;line-height:30px">{{comment.Commentuser}}&nbsp;&nbsp;&nbsp;&nbsp;{{comment.UpdatedAt}}</div>
                             <div>{{comment.Context}}</div>

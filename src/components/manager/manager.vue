@@ -3,7 +3,7 @@
         <div id="box_nav">
             <div id="nav_head">
                 <div id="head_img" style="flex:8">
-                    <img :src="'http://8.130.51.87:3000/'+user.head" alt="" id="img">
+                    <img :src="user.head" alt="" id="img">
                     <span id="btn_quit">
                         <el-dropdown @command="handleCommand">
                           <span class="el-dropdown-link">
@@ -22,7 +22,7 @@
                     </span>
                 </div>
                 <div id="head_name" style="flex:2">
-                    <div style="position:absolute;top:20px;left:90px;color:white;font-size:20px;font-weight:600">{{username}}</div>
+                    <div style="position:absolute;top:20px;width:100%;color:white;font-size:20px;font-weight:600;text-align:center"><h4 style="margin:0">{{username}}</h4></div>
                     <span><img src="../../assets/129.png" alt="" style="position:absolute;height:20px;top:-10px;right:50px"></span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
             <div id="selfBox">
               <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">普通管理员</div>
               <div style="text-align:center">
-                <el-image :src="'http://8.130.51.87:3000/'+user.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
+                <el-image :src="user.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
               </div>
               <div class="selfLines">昵称：{{user.username}}</div>
               <div class="selfLines">姓名：{{user.realname}}</div>

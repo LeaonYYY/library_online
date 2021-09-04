@@ -45,7 +45,7 @@
               <div>邮箱：{{userMode.email}}</div>
             </div>
             <div style="flex:4;display:flex;justify-content:center;align-items:center">
-              <el-image :src="'http://8.130.51.87:3000/'+userMode.head" style="height:100px;width:100px;border-radius:50px;"></el-image>
+              <el-image :src="userMode.head" style="height:100px;width:100px;border-radius:50px;"></el-image>
             </div>
           </div>
           <h4>个人简介：</h4>

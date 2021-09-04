@@ -10,7 +10,7 @@
       </el-menu></el-col>
       <el-col :span="5"><img src="../assets/组 58.png" alt="" style="height:40px"></el-col>
       <el-col :span="1" style="height:47px;line-height:47px"><el-badge is-dot :hidden="!isNewMsg"><i class="el-icon-bell" style="font-size:30px;" @click="msgVisible = true"></i></el-badge></el-col>
-      <el-col :span="1"><el-image :src="'http://8.130.51.87:3000/'+user.head" fit="fill" style="height:42px;width:42px;border-radius:21px"></el-image></el-col>
+      <el-col :span="1"><el-image :src="user.head" fit="fill" style="height:42px;width:42px;border-radius:21px"></el-image></el-col>
       <el-col :span="2" style="height:47px;line-height:47px"><span>{{user.username}}</span><el-button type="primary" class="btn_quit" @click="handleQuit">退出</el-button></el-col>
     </el-row>
     <el-dialog :visible.sync="msgVisible" title="消息通知" top="3vh" width="30%">

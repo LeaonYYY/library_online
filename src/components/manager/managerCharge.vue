@@ -74,7 +74,7 @@
             <div id="selfBox">
               <div style="text-align:center;color:#ecc054;font-size:25px;font-weight:500">普通管理员</div>
               <div style="text-align:center">
-                <el-image :src="'http://8.130.51.87:3000/'+pickManager.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
+                <el-image :src="pickManager.head" style="height:90px;width:90px;border-radius:45px;"></el-image>
               </div>
               <div class="selfLines">昵称：{{pickManager.username}}</div>
               <div class="selfLines">姓名：{{pickManager.realname}}</div>
@@ -200,7 +200,8 @@ export default {
       addManager_email: '',
       addManager_psw: '',
       addManager_tel: '',
-      addManager_ins: ''
+      addManager_ins: '',
+      avator_add: {}
     }
   },
   methods: {
@@ -239,6 +240,7 @@ export default {
     },
     handleAvatarChange (file, fileList) {
       this.imageUrl = URL.createObjectURL(file.raw)
+      this.avator_add = file
     },
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
@@ -254,6 +256,7 @@ export default {
     addBookAvatar (file) {
     },
     managerShow (item) {
+      console.log(item);
       this.pickManager = item
       this.managerVisible = true
     },
@@ -301,7 +304,7 @@ export default {
       params.append('password',this.addManager_psw)
       params.append('email',this.addManager_email)
       params.append('phone',this.addManager_tel)
-      params.append('imag','')
+      params.append('imag',this.avator_add.raw,this.avator_add.name)
       this.$axios({
         url: '/api/v1/admin/creat',
         method: 'put',

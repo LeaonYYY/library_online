@@ -160,7 +160,7 @@ export default {
     }
     #box_1{
         position: relative;
-        height: 705px;
+        height: 100%;
         width: 100%;
         background-image: url(../../assets/home_bp.png);
         background-size: 100% 100%;

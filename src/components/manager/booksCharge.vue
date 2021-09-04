@@ -81,7 +81,7 @@
         </el-dialog>
         <el-dialog :visible.sync="bookVisible" width="30%">
           <div style="display:flex;height:150px">
-            <div style="flex:4"><el-image :src="'http://8.130.51.87:3000/'+pickBook.imag" alt="" style="height:150px;width:140px"></el-image></div>
+            <div style="flex:4"><el-image :src="pickBook.imag" alt="" style="height:150px;width:140px"></el-image></div>
             <div style="flex:6;display:flex;justify-content:space-around;flex-direction:column;margin-left:70px">
               <h4>{{pickBook.bookname}}</h4>
               <div>出借：{{pickBook.borrowsum}}本</div>
@@ -98,7 +98,13 @@
             <el-button type="danger" id="btn_delete" @click="handleDelete(pickBook.ID)">
               下架
             </el-button>
+            <el-button type="warning" id="btn_upload" @click="uploadVisible = true">上传</el-button>
+            <el-button type="primary" @click="readOnline(pickBook.Bookurl)" id="btn_read">在线阅读</el-button>
           </div>
+        </el-dialog>
+        <el-dialog :visible.sync="uploadVisible" title="上传在线书籍">
+          <input type="file" id="file" name="file">
+          <el-button @click="handleUpload">上传</el-button>
         </el-dialog>
     </div>
 </template>
@@ -243,7 +249,8 @@ export default {
       addBook_num: '',
       addBook_ins: '',
       pickBook: {},
-      avator_add: {}
+      avator_add: {},
+      uploadVisible: false
     }
   },
   methods: {
@@ -276,7 +283,6 @@ export default {
         'Authorization': "Bearer "+localStorage.getItem('token1')
       }
     }).then((res)=>{
-      console.log(res);
       for(let i=0;i<res.data.data.length;i++){
         this.$set(this.itemsMode,i,res.data.data[i])
         this.itemsMode[i].CreatedAt = res.data.data[i].CreatedAt.slice(0,10)
@@ -376,6 +382,31 @@ export default {
     bookShow (item) {
       this.pickBook = item
       this.bookVisible = true
+      console.log(item);
+    },
+    readOnline(url){
+      window.open(url, '_blank');
+    },
+    handleUpload(){
+      var fileSenter = document.querySelector("#file");
+      var params = new FormData()
+      params.append('imag',fileSenter.files[0])
+      this.$axios({
+        url: '/api/v1/upload/'+this.pickBook.ID,
+        method: 'post',
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1'),
+        },
+        data: params
+      }) .then(res=>{
+        if(res.data.status === '创建成功'){
+          this.$message({
+            message: '上传成功',
+            type: 'success'
+          })
+          this.$router.go(0)
+        }
+      })
     }
   },
   mounted () {
@@ -532,7 +563,7 @@ export default {
   #btn_delete {
     height: 40px;
     padding: 0;
-    width: 100px;
+    width: 60px;
     color: white;
     background-color: red;
     border-radius: 20px;
@@ -542,7 +573,23 @@ export default {
   #btn_up {
     height: 40px;
     padding: 0;
+    width: 60px;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  #btn_read{
+    height: 40px;
+    padding: 0;
     width: 100px;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  #btn_upload{
+    height: 40px;
+    padding: 0;
+    width: 60px;
     border-radius: 20px;
     font-size: 17px;
     font-weight: 500;

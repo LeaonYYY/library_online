@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div id="box_head">
-            <el-image :src="'http://8.130.51.87:3000/'+imag" class="userimg"></el-image>
+            <el-image :src="imag" class="userimg"></el-image>
             <span class="username">{{username}}</span>
         </div>
         <div id="box_content">

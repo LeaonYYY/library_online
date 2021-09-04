@@ -30,7 +30,7 @@
         </div>
         <el-dialog :visible.sync="bookVisible" id="bookDetail" style="padding-top:0px" top="2vh">
             <div id="bookDetail_head" style="margin-left:60px">
-                <div style="height:200px;width:200px"><el-image :src="'http://8.130.51.87:3000/'+pickBook.imag"></el-image></div>
+                <div style="height:200px;width:200px"><el-image :src="pickBook.imag" style="height:200px"></el-image></div>
                 <div style="display:flex;flex-direction:column;justify-content:space-around;margin-left:60px">
                     <div><h3 style="margin:0">{{pickBook.bookname}}</h3></div>
                     <div style="height:90px;width:300px;display:flex;flex-direction:row;justify-content:space-between">
@@ -38,7 +38,10 @@
                             <div>作者：{{pickBook.author}}</div>
                              <div>上架时间：{{pickBook.CreatedAt}}</div>
                         </div>
-                        <div id="btn_lend"><el-button @click="handleBack(pickBook.ID)">归还</el-button></div>
+                        <div id="btn_lend">
+                          <el-button @click="handleBack(pickBook.ID)">归还</el-button>
+                          <el-button @click="readOnline(pickBook.Bookurl)">在线阅读</el-button>
+                        </div>
                     </div>
                     <div style="height:60px">介绍：{{pickBook.Introduce}}</div>
                 </div>
@@ -51,7 +54,7 @@
                 <h4>精彩评论:</h4>
                 <div id="comments">
                     <div class="comment" v-for="comment in comments" :key="comment.id">
-                        <div><img :src="'http://8.130.51.87:3000/'+comment.Head" alt="" style="height:30px"></div>
+                        <div><img :src="comment.Head" alt="" style="height:30px"></div>
                         <div style="display:flex;flex-direction:column">
                             <div style="height:30px;line-height:30px">{{comment.Commentuser}}&nbsp;&nbsp;&nbsp;&nbsp;{{comment.UpdatedAt}}</div>
                             <div>{{comment.Context}}</div>
@@ -167,6 +170,9 @@ export default {
         })
         this.$router.go(0)
       })
+    },
+    readOnline(url){
+      window.open(url, '_blank');
     }
   },
   mounted () {
@@ -226,13 +232,20 @@ export default {
         display: flex;
         height: 200px;
     }
+    #btn_lend {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+    }
     #btn_lend .el-button {
         padding: 0;
         height: 40px;
         width: 80px;
         border-radius: 20px;
         color: #ff9607;
-        border: 1px solid #ff9607
+        border: 1px solid #ff9607;
+        margin: 0;
     }
     #btn_lend .el-button:hover {
         background-color: #ff9607;
