@@ -84,7 +84,10 @@
             <div style="flex:4"><el-image :src="pickBook.imag" alt="" style="height:150px;width:140px"></el-image></div>
             <div style="flex:6;display:flex;justify-content:space-around;flex-direction:column;margin-left:70px">
               <h4>{{pickBook.bookname}}</h4>
-              <div>出借：{{pickBook.borrowsum}}本</div>
+              <div style="display:flex;flex-direction:row;justify-content:space-between">
+                <div>出借：{{pickBook.borrowsum}}本</div>
+                <div><el-button type='text' style="padding:0" @click="cgBook = true">修改</el-button></div>
+              </div>
               <div>剩余：{{pickBook.sum}}本</div>
               <div>作者：{{pickBook.author}}</div>
               <div>上架时间：{{pickBook.CreatedAt}}</div>
@@ -99,12 +102,43 @@
               下架
             </el-button>
             <el-button type="warning" id="btn_upload" @click="uploadVisible = true">上传</el-button>
-            <el-button type="primary" @click="readOnline(pickBook.Bookurl)" id="btn_read">在线阅读</el-button>
+            <el-button type="primary" @click="readOnline(pickBook.Bookurl)" id="btn_read">阅读</el-button>
+            <el-button type="danger" @click="handleDelete(pickBook.ID)" id="btn_del">删除</el-button>
           </div>
         </el-dialog>
         <el-dialog :visible.sync="uploadVisible" title="上传在线书籍">
           <input type="file" id="file" name="file">
           <el-button @click="handleUpload">上传</el-button>
+        </el-dialog>
+        <el-dialog :visible.sync="cgBook" width="50%">
+          <div id="add_head2">
+            <div id="head_img2" style="flex:2;">
+              <el-upload
+               class="avatar-uploader"
+               action="#"
+               :show-file-list="false"
+               :on-change="handleAvatarChange"
+               :before-upload="beforeAvatarUpload"
+               :http-request="addBookAvatar">
+               <img v-if="imageUrl" :src="imageUrl" class="avatar">
+               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+             </el-upload>
+            </div>
+            <div style="flex:8;display:flex;flex-direction:column;justify-content:space-around;margin-left:20px;">
+              <div><el-input placeholder="书名" v-model="addBook_name"></el-input></div>
+              <div><el-input placeholder="作者" v-model="addBook_author"></el-input></div>
+              <div style="display: flex;justify-content:space-between">
+                <div><el-input placeholder="种类" v-model="addBook_type"></el-input></div>
+                <div><el-input placeholder="上架数量" v-model="addBook_num"></el-input></div>
+              </div>
+            </div>
+          </div>
+          <div id="add_body2" style="margin:20px 0;">
+            <el-input type="textarea" :maxlength="250" show-word-limit v-model="addBook_ins" :rows="6" placeholder="内容简介"></el-input>
+          </div>
+          <div id="add_foot2">
+            <el-button @click="handleChangeBook">修改</el-button>
+          </div>
         </el-dialog>
     </div>
 </template>
@@ -250,7 +284,8 @@ export default {
       addBook_ins: '',
       pickBook: {},
       avator_add: {},
-      uploadVisible: false
+      uploadVisible: false,
+      cgBook: false
     }
   },
   methods: {
@@ -360,6 +395,46 @@ export default {
             type: 'error'
           })
         }
+      })
+    },
+    handleChangeBook(){
+      var params =new FormData()
+      params.append('bookname',this.addBook_name)
+      params.append('author',this.addBook_author)
+      params.append('booktype',this.addBook_type)
+      params.append('sum',this.addBook_num)
+      params.append('introduce',this.addBook_ins)
+      params.append('imag',this.avator_add.raw,this.avator_add.name)
+      this.$axios({
+        url: '/api/v1/book/'+this.pickBook.ID,
+        method: 'put',
+        data: params,
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1'),
+          'Content-Type':'multipart/form-data'
+        }
+      }).then((res)=>{
+          this.$message({
+            message: '修改成功',
+            type: 'success'
+          })
+          this.$router.go(0)
+        
+      })
+    },
+    handleDelete(id){
+      this.$axios({
+        url: '/api/v1/book/'+id,
+        method:'delete',
+        headers: {
+          'Authorization': "Bearer "+localStorage.getItem('token1'),
+        }
+      }) .then(res=>{
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        })
+        this.$router.go(0)
       })
     },
     handleAvatarChange (file, fileList) {
@@ -519,6 +594,10 @@ export default {
         display: flex;
         height: 200px;
     }
+    #add_head2 {
+        display: flex;
+        height: 200px;
+    }
     #head_img /deep/ .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9 ;
     border-radius: 6px;
@@ -526,7 +605,17 @@ export default {
     position: relative;
     overflow: hidden;
   }
+  #head_img2 /deep/ .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9 ;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
   #head_img /deep/ .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  #head_img2 /deep/ .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
   }
   .avatar-uploader-icon {
@@ -546,7 +635,14 @@ export default {
     border:1px solid #8c939d;
     border-radius: 20px;
   }
+  #add_head2 .el-input /deep/ .el-input__inner {
+    border:1px solid #8c939d;
+    border-radius: 20px;
+  }
   #add_foot {
+    text-align: center;
+  }
+  #add_foot2 {
     text-align: center;
   }
   #add_foot .el-button {
@@ -557,7 +653,18 @@ export default {
     font-size: 17px;
     font-weight: 500;
   }
+  #add_foot2 .el-button {
+    width: 150px;
+    color: white;
+    background-color: #42914b;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
   #add_foot .el-button:hover {
+    background-color: #3b8543;
+  }
+  #add_foot2 .el-button:hover {
     background-color: #3b8543;
   }
   #btn_delete {
@@ -581,7 +688,15 @@ export default {
   #btn_read{
     height: 40px;
     padding: 0;
-    width: 100px;
+    width: 60px;
+    border-radius: 20px;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  #btn_del{
+    height: 40px;
+    padding: 0;
+    width: 60px;
     border-radius: 20px;
     font-size: 17px;
     font-weight: 500;
